@@ -1,7 +1,6 @@
 litestar==2.0.0
 uvicorn==0.23.2
 python-multipart==0.0.6
-
 setuptools==65.5.0
 aenum==3.1.15
 amqp==5.2.0
