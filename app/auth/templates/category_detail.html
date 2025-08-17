@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kategória: {{ category.name }}</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #E8F5E9;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --gray: #9E9E9E;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.4rem;
+        }
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        .word-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .word-sk {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--dark-green);
+        }
+        .word-en {
+            font-size: 1rem;
+            color: #555;
+            margin: 0.5rem 0;
+        }
+        .word-level {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .level-1 {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .level-2 {
+            background-color: #fff59d;
+            color: #f9a825;
+        }
+        .level-3 {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        .word-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+        .level-form {
+            display: inline-block;
+        }
+        .level-select {
+            padding: 0.2rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.8rem;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        .category-actions {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .edit-btn, .delete-category-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .edit-btn:hover, .delete-category-btn:hover {
+            background-color: #2e7d32;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--primary-green);
+            color: var(--white);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: var(--white);
+            margin: 15% auto;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--dark-green);
+        }
+        .modal-actions {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .confirm-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .confirm-btn:hover {
+            background-color: #d32f2f;
+        }
+        .cancel-btn {
+            background-color: var(--gray);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--white);
+        }
+        .cancel-btn:hover {
+            background-color: #7e7e7e;
+        }
+    </style>
+</head>
+<body>
+    <a href="/dashboard" class="edit-btn">Späť na dashboard</a>
+    <header>
+        <h1>Kategória: {{ category.name }}</h1>
+    </header>
+    <main>
+        {% set flashes = get_flashes() %}
+        {% if flashes %}
+            <div class="flash-messages">
+                {% for flash in flashes %}
+                    <div class="flash-message {{ flash.category }}">
+                        {{ flash.message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+<div class="category-actions">
+    <form method="post" action="/category/{{ category.id }}/edit" style="display:inline;">
+        <input type="text" name="name" value="{{ category.name }}" required style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;"/>
+        <button type="submit" class="edit-btn" style="background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Upraviť kategóriu</button>
+    </form>
+    <button type="button" class="delete-category-btn" onclick="openDeleteModal()" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Vymazať kategóriu</button>
+</div>
+
+<!-- Excel Import Section -->
+<div class="category-actions" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
+    <h3>Import slovíčok z Excel súboru</h3>
+    <form method="post" action="/category/{{ category.id }}/import-excel" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 1rem;">
+        <input type="file" 
+               name="excel_file" 
+               accept=".xlsx,.xls" 
+               required 
+               style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <button type="submit" 
+                class="edit-btn" 
+                style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">
+            Importovať slovíčka
+        </button>
+    </form>
+    <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+        <strong>Formát súboru:</strong> Excel súbor (.xlsx alebo .xls) s dvoma stĺpcami:<br>
+        1. stĺpec: slovíčko (SK)<br>
+        2. stĺpec: preklad (EN)<br>
+        <strong>Maximálna veľkosť:</strong> 2MB
+    </p>
+</div>
+
+        <!-- Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3>Potvrdenie vymazania</h3>
+                <p>Naozaj chcete vymazať túto kategóriu?</p>
+                <div class="modal-actions">
+                    <form id="deleteForm" method="post" action="/category/{{ category.id }}/delete">
+                        <button type="submit" class="confirm-btn">Áno, vymazať</button>
+                    </form>
+                    <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Zrušiť</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>Slová v kategórii</h2>
+        {% if words %}
+            {% for word in words %}
+                <div class="word-card">
+                    <div class="word-sk">{{ word.sk }}</div>
+                    <div class="word-en">{{ word.en }}</div>
+                    <span class="word-level level-{{ word.level }}">Úroveň: {{ word.level }}</span>
+                    <div class="word-actions">
+                        <form class="level-form" action="/word/{{ word.id }}/level" method="post">
+                            <select class="level-select" name="level" onchange="this.form.submit()">
+                                <option value="1" {% if word.level == 1 %}selected{% endif %}>Neviem</option>
+                                <option value="2" {% if word.level == 2 %}selected{% endif %}>Opakovať</option>
+                                <option value="3" {% if word.level == 3 %}selected{% endif %}>Viem</option>
+                            </select>
+                        </form>
+                        <form class="delete-form" action="/word/{{ word.id }}/delete" method="post" onsubmit="return confirm('Naozaj chcete odstrániť toto slovo?')">
+                            <button type="submit" class="delete-btn">Odstrániť</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>V tejto kategórii zatiaľ nie sú žiadne slová.</p>
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2023 Vaša Spoločnosť. Všetky práva vyhradené.</p>
+    </footer>
+
+    <script>
+        function openDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('deleteModal')) {
+                closeDeleteModal();
+            }
+        }
+    </script>
+</body>
+</html>
