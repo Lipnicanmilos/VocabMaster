@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #E8F5E9;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --gray: #9E9E9E;
+        }
+
+        .flash-messages {
+            max-width: 900px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.4rem;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--white);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            color: var(--dark-green);
+            font-size: 1.1em;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        h2, h3 {
+            color: var(--dark-green);
+            border-bottom: 2px solid var(--primary-green);
+            padding-bottom: 0.3rem;
+            margin-top: 2rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+            background: var(--light-green);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        input, select, button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--dark-green);
+        }
+
+        .welcome-box {
+            background-color: var(--light-green);
+            border-left: 5px solid var(--primary-green);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+            transition: opacity 0.5s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--primary-green);
+            color: var(--white);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+
+        /* Štýly pre zoznam kategórií */
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .category-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-item a {
+            text-decoration: none;
+            color: var(--dark-green);
+            font-weight: 500;
+        }
+
+        .category-item a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin: 0 1rem;
+                padding: 1.5rem;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            form {
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn" onclick="logout()">Odhlásiť sa</button>
+
+    <div class="user-info">
+        Prihlásený ako: <strong>{{ email }}</strong>
+    </div>
+
+    <header>
+        <h1>Vitajte v Dashboarde</h1>
+    </header>
+
+    <main>
+        {% set flashes = get_flashes() %}
+        {% if flashes %}
+            <div class="flash-messages">
+                {% for flash in flashes %}
+                    <div class="flash-message {{ flash.category }}">
+                        {{ flash.message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h2>Tvoje kategórie</h2>
+
+        <ul class="category-list">
+            {% for category in categories %}
+                <li class="category-item">
+                    <a href="/category/{{ category.id }}">{{ category.name }}</a>
+                </li>
+            {% else %}
+                <li class="category-item">
+                    Žiadne kategórie zatiaľ neexistujú.
+                </li>
+            {% endfor %}
+        </ul>
+
+        <form method="post" action="/category">
+            <input type="text" name="name" placeholder="Názov kategórie" required>
+            <button type="submit">Vytvoriť kategóriu</button>
+        </form>
+
+        <h3>Pridať slovíčko</h3>
+        <form method="post" action="/word">
+            <input type="text" name="sk" placeholder="Slovensky" required>
+            <input type="text" name="en" placeholder="Anglicky" required>
+            <select name="category_id" required>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% else %}
+                    <option disabled selected>Žiadne kategórie</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Pridať slovíčko</button>
+        </form>
+
+        <h3>Testuj slovíčka</h3>
+        <div style="margin: 1rem 0;">
+            <h4>Vyberte kategóriu a úroveň pre test:</h4>
+            {% for category in categories %}
+                <div style="margin: 0.5rem 0; padding: 0.5rem; background-color: var(--light-green); border-radius: 5px;">
+                    <strong>{{ category.name }}</strong>
+                    <div style="margin-top: 0.5rem;">
+                        <a href="/test?category_id={{ category.id }}&level=1" 
+                           style="display: inline-block; margin: 0.2rem; padding: 0.5rem 1rem; background-color: #ffcdd2; color: #c62828; border-radius: 15px; text-decoration: none; font-size: 0.9rem;">
+                            Neviem (1)
+                        </a>
+                        <a href="/test?category_id={{ category.id }}&level=2" 
+                           style="display: inline-block; margin: 0.2rem; padding: 0.5rem 1rem; background-color: #fff59d; color: #f9a825; border-radius: 15px; text-decoration: none; font-size: 0.9rem;">
+                            Opakovať (2)
+                        </a>
+                        <a href="/test?category_id={{ category.id }}&level=3" 
+                           style="display: inline-block; margin: 0.2rem; padding: 0.5rem 1rem; background-color: #c8e6c9; color: #2e7d32; border-radius: 15px; text-decoration: none; font-size: 0.9rem;">
+                            Viem (3)
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h3>Moje slovíčka</h3>
+        <p>Prezrite si všetky svoje slovíčka zoradené podľa kategórií.</p>
+        <a href="/words" style="display: inline-block; padding: 0.8rem 1.5rem; background-color: var(--primary-green); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; transition: all 0.3s ease;">Zobraziť slovíčka</a>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Vaša Spoločnosť. Všetky práva vyhradené.</p>
+    </footer>
+
+    <script>
+        async function logout() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/logout';
+                setTimeout(() => {
+                    if (window.location.pathname !== '/') {
+                        window.location.href = '/';
+                    }
+                }, 500);
+            } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = '/';
+            }
+        }
+    </script>
+</body>
+</html>

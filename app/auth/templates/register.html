@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --error-red: #F44336;
+            --error-bg: #FFEBEE;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .register-container {
+            background-color: var(--white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            margin: 1rem;
+        }
+        
+        h1 {
+            color: var(--dark-green);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary-green);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        #message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .success {
+            color: green;
+            background-color: #E8F5E9;
+            border: 1px solid green;
+        }
+        
+        .error {
+            color: var(--error-red);
+            background-color: var(--error-bg);
+            border: 1px solid var(--error-red);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .home-button {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .home-button a {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .home-button a:hover {
+            background-color: var(--dark-green);
+        }
+        
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>Zaregistrovať sa</h1>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Heslo:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+            <button type="submit">Zaregistrovať sa</button>
+        </form>
+        <div id="message"></div>
+        <div class="login-link">
+            Už máte účet? <a href="/login">Prihlásiť sa</a>
+        </div>
+        <div class="home-button">
+            <a href="/">Späť na domovskú stránku</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = form.email.value;
+            const password = form.password.value;
+
+            // Custom email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                messageDiv.textContent = 'Prosím zadajte platný e-mail.';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+                return; // Stop the form submission
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = 'Registrácia bola úspešná!';
+                    messageDiv.className = 'success';
+                    messageDiv.style.display = 'block';
+                    form.reset();
+                } else {
+                    messageDiv.textContent = data.detail || 'Registrácia zlyhala.';
+                    messageDiv.className = 'error';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Nastala chyba. Skúste to prosím znova.';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

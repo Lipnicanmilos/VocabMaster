@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test - {{ category.name }} - Úroveň {{ level }}</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #E8F5E9;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --gray: #9E9E9E;
+            --red: #f44336;
+            --yellow: #ff9800;
+            --blue: #2196F3;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+        .test-info {
+            background-color: var(--light-green);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .word-card {
+            background: var(--white);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .word-card:hover {
+            transform: translateY(-2px);
+        }
+        .word-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+        }
+        .translation {
+            font-size: 1.5rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .translation.show {
+            opacity: 1;
+        }
+        .level-info {
+            background-color: var(--light-green);
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .level-change {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background-color: var(--light-gray);
+            border-radius: 5px;
+        }
+        .level-display {
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+        .level-target {
+            font-weight: bold;
+            color: var(--blue);
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        .btn-secondary {
+            background-color: var(--gray);
+            color: var(--white);
+        }
+        .btn-warning {
+            background-color: var(--yellow);
+            color: var(--white);
+        }
+        .btn-danger {
+            background-color: var(--red);
+            color: var(--white);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .level-selector {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        .level-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--primary-green);
+            background: var(--white);
+            color: var(--primary-green);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .level-btn.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-green);
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        footer {
+            background-color: var(--primary-green);
+            color: var(--white);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Test - {{ category.name }} - Úroveň {{ level }}</h1>
+    </header>
+
+    <div class="test-container" data-category-id="{{ category.id }}" data-level="{{ level }}">
+        <div class="test-info">
+            <strong>Kategória:</strong> {{ category.name }} | 
+            <strong>Úroveň:</strong> <span id="current-level">{{ level }}</span> |
+            <strong>Slovíčko:</strong> <span id="current-count">1</span> z <span id="total-count">{{ total_words }}</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- Removed the current word level display as per user request -->
+        <!-- <div class="level-info" id="level-info">
+            <strong>Aktuálna úroveň slovíčka:</strong> <span id="word-level-display">1</span>
+        </div> -->
+
+        <div class="level-change">
+            <!-- Removed current word level display as per user request -->
+            <!-- <div class="level-display">
+                <strong>Aktuálna úroveň:</strong> <span id="current-word-level">1</span>
+            </div> -->
+            <!-- Removed the entire "Nová úroveň pri" line as per user request -->
+            <!-- <div class="level-target">
+                <strong>Nová úroveň pri:</strong>
+                <span id="next-level-known"></span> (poznám) / 
+                <span id="next-level-unknown"></span> (neviem)
+            </div> -->
+        </div>
+
+        <div class="word-card" id="word-card" onclick="showTranslation()">
+            <div class="word-text" id="word-sk"></div>
+            <div class="translation" id="translation"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-warning" id="btn-unknown" onclick="markUnknown()">
+                Neviem (1)
+            </button>
+            <button class="btn btn-primary" id="btn-repeat" onclick="markRepeat()">
+                Opakovať (2)
+            </button>
+            <button class="btn btn-success" id="btn-known" onclick="markKnown()">
+                Viem (3)
+            </button>
+            <button class="btn btn-secondary" id="btn-next" onclick="nextWord()">Ďalšie</button>
+            <button class="btn btn-secondary" id="btn-end-test" onclick="endTest()" style="display: inline-block;">
+                Ukončiť test
+            </button>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Vocabulary App
+    </footer>
+
+    <script>
+        let words = [];
+        let currentIndex = 0;
+        let translationShown = false;
+
+        const categoryId = document.querySelector('.test-container').dataset.categoryId;
+        const level = document.querySelector('.test-container').dataset.level;
+
+        const wordSkElem = document.getElementById('word-sk');
+        const translationElem = document.getElementById('translation');
+        const currentCountElem = document.getElementById('current-count');
+        const totalCountElem = document.getElementById('total-count');
+        const progressFillElem = document.getElementById('progress-fill');
+        // Odstránené referencie na neexistujúce elementy
+        // const currentWordLevelElem = document.getElementById('current-word-level');
+        // const nextLevelKnownElem = document.getElementById('next-level-known');
+        // const nextLevelUnknownElem = document.getElementById('next-level-unknown');
+        // The buttons have no spans for levels, so update button text directly
+        const btnKnown = document.getElementById('btn-known');
+        const btnUnknown = document.getElementById('btn-unknown');
+        // Remove references to knownLevelElem and unknownLevelElem
+        // const knownLevelElem = document.getElementById('known-level');
+        // const unknownLevelElem = document.getElementById('unknown-level');
+        // const wordLevelDisplayElem = document.getElementById('word-level-display');
+
+        // Custom level mapping for next known and unknown levels
+        const levelMapping = {
+            0: { known: 1, unknown: 0 },
+            1: { known: 2, unknown: 3 },
+            2: { known: 3, unknown: 1 },
+            3: { known: 4, unknown: 2 },
+            4: { known: 5, unknown: 3 },
+            5: { known: 5, unknown: 4 }
+        };
+
+        async function fetchWords() {
+            try {
+                // Fix fetch URL to use path parameters instead of query parameters
+                const response = await fetch(`/test/${categoryId}/${level}`);
+                if (!response.ok) {
+                    console.error('Fetch error:', response.status, response.statusText);
+                    return;
+                }
+                try {
+                    words = await response.json();
+                } catch (jsonError) {
+                    const text = await response.text();
+                    console.error('JSON parse error:', jsonError, 'Response text:', text);
+                    return;
+                }
+                if (words.length === 0) {
+                    console.warn('No words found for this level.');
+                    // Nezobrazujeme alert pre prázdne slovíčka, len ticho ukončíme
+                    // alebo môžeme zobraziť iný typ notifikácie
+                    const wordCard = document.getElementById('word-card');
+                    if (wordCard) {
+                        wordCard.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--gray);">Žiadne slovíčka na tejto úrovni</div>';
+                    }
+                    // Skryť tlačidlá pre ovládanie testu
+                    document.querySelector('.controls').style.display = 'none';
+                    return;
+                }
+                currentIndex = 0;
+                showWord();
+            } catch (error) {
+                console.error('Fetch exception:', error);
+                // Zobraziť alert len pri skutočnej chybe siete
+                if (error.name !== 'AbortError') {
+                    alert('Chyba pri načítaní slovíčok: ' + error.message);
+                }
+            }
+        }
+
+        function showWord() {
+            translationShown = false;
+            const word = words[currentIndex];
+            wordSkElem.textContent = word.sk;
+            translationElem.textContent = word.en;
+            translationElem.classList.remove('show');
+            currentCountElem.textContent = currentIndex + 1;
+            
+            // Update level displays
+            const currentLevel = word.level;
+            
+            // Use custom mapping for next levels
+            const nextKnown = levelMapping[currentLevel]?.known ?? Math.min(currentLevel + 1, 5);
+            const nextUnknown = levelMapping[currentLevel]?.unknown ?? Math.max(currentLevel - 1, 0);
+            
+            // Update button text directly instead of spans
+            if (btnKnown) {
+                if (level == 3) {
+                    btnKnown.style.display = 'none';
+                } else {
+                    btnKnown.style.display = 'inline-block';
+                    btnKnown.textContent = `Viem (${(nextKnown === currentLevel || nextKnown == level) ? '' : nextKnown})`;
+                }
+            }
+            if (btnUnknown) {
+                if (level == 1) {
+                    btnUnknown.style.display = 'none';
+                } else {
+                    btnUnknown.style.display = 'inline-block';
+                    btnUnknown.textContent = `Neviem (${(nextUnknown === currentLevel || nextUnknown == level) ? '' : nextUnknown})`;
+                }
+            }
+            const btnRepeat = document.getElementById('btn-repeat');
+            if (btnRepeat) {
+                if (level == 2) {
+                    btnRepeat.style.display = 'none';
+                } else {
+                    btnRepeat.style.display = 'inline-block';
+                    btnRepeat.textContent = `Opakovať (${2})`;
+                }
+            }
+            // Odstránené referencie na neexistujúce elementy
+            // nextLevelKnownElem.textContent = (nextKnown === currentLevel || nextKnown == level) ? '' : nextKnown;
+            // nextLevelUnknownElem.textContent = (nextUnknown === currentLevel || nextUnknown == level) ? '' : nextUnknown;
+            
+            updateProgress();
+        }
+
+        function showTranslation() {
+            if (!translationShown) {
+                translationElem.classList.add('show');
+                translationShown = true;
+            }
+        }
+
+        async function updateWordLevel(wordId, newLevel) {
+            try {
+                const response = await fetch(`/word/${wordId}/level`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `level=${newLevel}`
+                });
+                if (!response.ok) {
+                    alert('Chyba pri aktualizácii úrovne slova.');
+                }
+            } catch (error) {
+                alert('Chyba pri aktualizácii úrovne slova.');
+                console.error(error);
+            }
+        }
+
+        function markKnown() {
+            const word = words[currentIndex];
+            const newLevel = 3; // Viem (3)
+            updateWordLevel(word.id, newLevel);
+            nextWord();
+        }
+
+        function markRepeat() {
+            const word = words[currentIndex];
+            const newLevel = 2; // Opakovať (2)
+            updateWordLevel(word.id, newLevel);
+            nextWord();
+        }
+
+        function markUnknown() {
+            const word = words[currentIndex];
+            const newLevel = 1; // Neviem (1)
+            updateWordLevel(word.id, newLevel);
+            nextWord();
+        }
+
+        function endTest() {
+            window.location.href = '/dashboard';
+        }
+
+        function nextWord() {
+            if (currentIndex < words.length - 1) {
+                currentIndex++;
+                showWord();
+            } else {
+                console.log('Test finished, showing end test button');
+                // Show end test button and hide other controls
+                document.getElementById('btn-known').style.display = 'none';
+                document.getElementById('btn-unknown').style.display = 'none';
+                document.getElementById('btn-next').style.display = 'none';
+                
+                const endTestBtn = document.getElementById('btn-end-test');
+                if (endTestBtn) {
+                    endTestBtn.style.display = 'inline-block';
+                } else {
+                    const btn = document.createElement('button');
+                    btn.id = 'btn-end-test';
+                    btn.className = 'btn btn-secondary';
+                    btn.textContent = 'Ukončiť test';
+                    btn.onclick = () => {
+                        window.location.href = '/dashboard';
+                    };
+                    document.querySelector('.controls').appendChild(btn);
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progressPercent = ((currentIndex) / words.length) * 100;
+            progressFillElem.style.width = progressPercent + '%';
+        }
+
+        // Initialize
+        fetchWords();
+    </script>
+</body>
+</html>

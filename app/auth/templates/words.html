@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje slovíčka</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #E8F5E9;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --gray: #9E9E9E;
+        }
+
+        .flash-messages {
+            max-width: 900px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .flash-message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.4rem;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: var(--gray);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background-color: #757575;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--white);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            color: var(--dark-green);
+            font-size: 1.1em;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        h2, h3 {
+            color: var(--dark-green);
+            border-bottom: 2px solid var(--primary-green);
+            padding-bottom: 0.3rem;
+            margin-top: 2rem;
+        }
+
+        .category-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: var(--light-green);
+            border-radius: 8px;
+        }
+
+        .category-title {
+            color: var(--dark-green);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .words-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .word-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .word-sk {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--dark-green);
+        }
+
+        .word-en {
+            font-size: 1rem;
+            color: #555;
+            margin: 0.5rem 0;
+        }
+
+        .word-level {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .level-1 {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+
+        .level-2 {
+            background-color: #fff59d;
+            color: #f9a825;
+        }
+
+        .level-3 {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .word-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .level-form {
+            display: inline-block;
+        }
+
+        .level-select {
+            padding: 0.2rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .no-words {
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+            padding: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--primary-green);
+            color: var(--white);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin: 0 1rem;
+                padding: 1.5rem;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .words-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/dashboard" class="back-btn">Späť na dashboard</a>
+    <button class="logout-btn" onclick="logout()">Odhlásiť sa</button>
+
+    <div class="user-info">
+        Prihlásený ako: <strong>{{ email }}</strong>
+    </div>
+
+    <header>
+        <h1>Moje slovíčka</h1>
+    </header>
+
+    <main>
+        {% set flashes = get_flashes() %}
+        {% if flashes %}
+            <div class="flash-messages">
+                {% for flash in flashes %}
+                    <div class="flash-message {{ flash.category }}">
+                        {{ flash.message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% for category_data in categories_with_words %}
+            <div class="category-section">
+                <h2 class="category-title">{{ category_data.category.name }}</h2>
+                
+                {% if category_data.words %}
+                    <div class="words-grid">
+                        {% for word in category_data.words %}
+                            <div class="word-card">
+                                <div class="word-sk">{{ word.sk }}</div>
+                                <div class="word-en">{{ word.en }}</div>
+                                <span class="word-level level-{{ word.level }}">Úroveň: {{ word.level }}</span>
+                                <div class="word-actions">
+                                    <form class="level-form" action="/word/{{ word.id }}/level" method="post">
+                                        <select class="level-select" name="level" onchange="this.form.submit()">
+                                            <option value="1" {% if word.level == 1 %}selected{% endif %}>Neviem</option>
+                                            <option value="2" {% if word.level == 2 %}selected{% endif %}>Opakovať</option>
+                                            <option value="3" {% if word.level == 3 %}selected{% endif %}>Viem</option>
+                                        </select>
+                                    </form>
+                                    <form class="delete-form" action="/word/{{ word.id }}/delete" method="post" onsubmit="return confirm('Naozaj chcete odstrániť toto slovo?')">
+                                        <button type="submit" class="delete-btn">Odstrániť</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-words">V tejto kategórii zatiaľ nie sú žiadne slovíčka.</div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="no-words">Zatiaľ nemáte žiadne kategórie. Vytvorte si kategóriu na dashboardu.</div>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Vaša Spoločnosť. Všetky práva vyhradené.</p>
+    </footer>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Naozaj chcete odstrániť toto slovo?</p>
+            <div class="modal-buttons">
+                <button id="confirmDelete" class="confirm-btn">Áno</button>
+                <button id="cancelDelete" class="cancel-btn">Zrušiť</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .confirm-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .confirm-btn:hover {
+            background-color: #2e7d32;
+        }
+
+        .cancel-btn {
+            background-color: var(--gray);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background-color: #757575;
+        }
+    </style>
+
+    <script>
+        async function logout() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/logout';
+                setTimeout(() => {
+                    if (window.location.pathname !== '/') {
+                        window.location.href = '/';
+                    }
+                }, 500);
+            } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Custom delete confirmation modal logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('deleteModal');
+            const confirmBtn = document.getElementById('confirmDelete');
+            const cancelBtn = document.getElementById('cancelDelete');
+            let formToSubmit = null;
+
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    formToSubmit = form;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            confirmBtn.addEventListener('click', () => {
+                if (formToSubmit) {
+                    modal.style.display = 'none';
+                    formToSubmit.submit();
+                }
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                formToSubmit = null;
+            });
+
+            // Close modal when clicking outside modal content
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    formToSubmit = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
