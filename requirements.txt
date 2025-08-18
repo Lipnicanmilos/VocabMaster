@@ -8,7 +8,6 @@ certifi==2025.7.9
 cffi==1.17.1
 click==8.2.1
 colorama==0.4.6
-<<<<<<< HEAD
 cryptography==45.0.5
 dnspython==2.7.0
 ecdsa==0.19.1
