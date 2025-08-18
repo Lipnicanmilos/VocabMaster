@@ -58,7 +58,6 @@ tzdata==2025.2
 uvicorn==0.35.0
 watchfiles==1.1.0
 websockets==15.0.1
-=======
 colour==0.1.5
 cron-descriptor==1.4.3
 cryptography==42.0.0
@@ -179,4 +178,3 @@ xhtml2pdf==0.2.15
 XlsxWriter==3.1.9
 zipp==3.19.2
 zopfli==0.2.3
->>>>>>> 7b998efdfeefbce6a9949be06d27c0ac4b5c64f7
