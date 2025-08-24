@@ -14,6 +14,8 @@
             --gray: #9E9E9E;
             --red: #f44336;
             --yellow: #ff9800;
+
+            
             --blue: #2196F3;
         }
         body {
@@ -74,7 +76,7 @@
             color: var(--gray);
             margin-bottom: 1rem;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.0s ease;
         }
         .translation.show {
             opacity: 1;
@@ -229,19 +231,40 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-warning" id="btn-unknown" onclick="markUnknown()">
-                Neviem (1)
-            </button>
-            <button class="btn btn-primary" id="btn-repeat" onclick="markRepeat()">
-                Opakovať (2)
-            </button>
-            <button class="btn btn-success" id="btn-known" onclick="markKnown()">
-                Viem (3)
-            </button>
-            <button class="btn btn-secondary" id="btn-next" onclick="nextWord()">Ďalšie</button>
-            <button class="btn btn-secondary" id="btn-end-test" onclick="endTest()" style="display: inline-block;">
-                Ukončiť test
-            </button>
+            <!-- "Ďalšie" button centered under the card -->
+            <div style="width: 100%; text-align: center; margin-bottom: 1rem;">
+                <button class="btn btn-secondary" id="btn-next" onclick="nextWord()">Ďalšie</button>
+            </div>
+            
+            <!-- Text "Zmena úrovne slovíčka" -->
+            <div style="width: 100%; text-align: center; margin-bottom: 1rem; font-weight: bold; color: var(--dark-green);">
+                Zmena úrovne slovíčka
+            </div>
+            
+            <!-- Two buttons for changing level -->
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                <button class="btn btn-warning" id="btn-unknown" onclick="markUnknown()">
+                    Neviem (1)
+                </button>
+                                <button class="btn btn-primary" id="btn-repeat" onclick="markRepeat()">
+                    Opakovať (2)
+                </button>
+                <button class="btn btn-success" id="btn-known" onclick="markKnown()">
+                    Viem (3)
+                </button>
+            </div>
+            
+            <!-- "Opakovať" button -->
+            <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+
+            </div>
+            
+            <!-- "Ukončiť" button centered at the end -->
+            <div style="width: 100%; text-align: center; margin-top: 1rem;">
+                <button class="btn btn-secondary" id="btn-end-test" onclick="endTest()">
+                    Ukončiť test
+                </button>
+            </div>
         </div>
     </div>
 
@@ -323,11 +346,13 @@
         }
 
         function showWord() {
+            // Ensure translation is hidden before showing new word
+            translationElem.classList.remove('show');
             translationShown = false;
+            
             const word = words[currentIndex];
             wordSkElem.textContent = word.sk;
             translationElem.textContent = word.en;
-            translationElem.classList.remove('show');
             currentCountElem.textContent = currentIndex + 1;
             
             // Update level displays
@@ -337,35 +362,39 @@
             const nextKnown = levelMapping[currentLevel]?.known ?? Math.min(currentLevel + 1, 5);
             const nextUnknown = levelMapping[currentLevel]?.unknown ?? Math.max(currentLevel - 1, 0);
             
-            // Update button text directly instead of spans
-            if (btnKnown) {
-                if (level == 3) {
-                    btnKnown.style.display = 'none';
-                } else {
-                    btnKnown.style.display = 'inline-block';
-                    btnKnown.textContent = `Viem (${(nextKnown === currentLevel || nextKnown == level) ? '' : nextKnown})`;
-                }
-            }
-            if (btnUnknown) {
-                if (level == 1) {
-                    btnUnknown.style.display = 'none';
-                } else {
-                    btnUnknown.style.display = 'inline-block';
-                    btnUnknown.textContent = `Neviem (${(nextUnknown === currentLevel || nextUnknown == level) ? '' : nextUnknown})`;
-                }
-            }
+            // Update button visibility and text based on current test level
+            const btnKnown = document.getElementById('btn-known');
+            const btnUnknown = document.getElementById('btn-unknown');
             const btnRepeat = document.getElementById('btn-repeat');
-            if (btnRepeat) {
-                if (level == 2) {
-                    btnRepeat.style.display = 'none';
-                } else {
-                    btnRepeat.style.display = 'inline-block';
-                    btnRepeat.textContent = `Opakovať (${2})`;
-                }
+            
+            // Reset all buttons to default state
+            btnKnown.style.display = 'inline-block';
+            btnUnknown.style.display = 'inline-block';
+            btnRepeat.style.display = 'inline-block';
+            
+            // Adjust buttons based on test level
+            if (level == 1) {
+                // Level 1: Show "Opakovať (2)" and "Viem (3)"
+                btnRepeat.textContent = 'Opakovať (2)'; // Show "Opakovať (2)"
+                btnKnown.textContent = 'Viem (3)'; // Show "Viem (3)"
+                btnUnknown.style.display = 'none'; // Hide "Neviem" button
+            } else if (level == 2) {
+                // Level 2: Show "Neviem (1)" and "Viem (3)"
+                btnRepeat.style.display = 'none';
+                btnUnknown.textContent = 'Neviem (1)';
+                btnKnown.textContent = 'Viem (3)';
+                btnRepeat.style.display = 'none'; // Hide "Opakovať" button
+            } else if (level == 3) {
+                // Level 3: Show "Neviem (1)" and "Opakovať (2)"
+                btnKnown.style.display = 'none';
+                btnUnknown.textContent = 'Neviem (1)';
+                btnRepeat.textContent = 'Opakovať (2)';
+            } else {
+                // For other levels, show all buttons with appropriate text
+                btnUnknown.textContent = `Neviem (${(nextUnknown === currentLevel || nextUnknown == level) ? '' : nextUnknown})`;
+                btnRepeat.textContent = `Opakovať (${2})`;
+                btnKnown.textContent = `Viem (${(nextKnown === currentLevel || nextKnown == level) ? '' : nextKnown})`;
             }
-            // Odstránené referencie na neexistujúce elementy
-            // nextLevelKnownElem.textContent = (nextKnown === currentLevel || nextKnown == level) ? '' : nextKnown;
-            // nextLevelUnknownElem.textContent = (nextUnknown === currentLevel || nextUnknown == level) ? '' : nextUnknown;
             
             updateProgress();
         }
@@ -374,6 +403,10 @@
             if (!translationShown) {
                 translationElem.classList.add('show');
                 translationShown = true;
+            } else {
+                // Allow toggling translation visibility
+                translationElem.classList.remove('show');
+                translationShown = false;
             }
         }
 

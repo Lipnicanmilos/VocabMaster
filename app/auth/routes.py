@@ -96,8 +96,11 @@ async def login_user(
         
         if not user or not verify_password(password, user.hashed_password):
             logging.info("Invalid credentials")
-            flash(request, "Nesprávny email alebo heslo", "error")
-            return Redirect(path="/login", status_code=status_codes.HTTP_303_SEE_OTHER)
+            return Response(
+                content={"detail": "Nesprávny email alebo heslo"},
+                media_type="application/json",
+                status_code=status_codes.HTTP_401_UNAUTHORIZED
+            )
         
         flash(request, "Úspešne ste sa prihlásili.", "success")
         logging.info("Flash message set in login_user")
