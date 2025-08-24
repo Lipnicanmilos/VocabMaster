@@ -1,15 +1,12 @@
-# TODO: Import slovíčok z Excel súboru
+# Fix Translation Display Issue in Test Template
 
-## ✅ Dokončené
-- [x] Analýza existujúcej aplikácie
-- [x] Vytvorenie komplexného plánu implementácie
-- [x] Schválenie plánu používateľom
+## Steps to Complete:
+1. [ ] Fix showTranslation() function to properly toggle translation visibility
+2. [ ] Improve nextWord() function to handle translation state correctly
+3. [ ] Add proper state management for translation visibility
+4. [ ] Test the fix by running the application
 
-## 🔄 V implementácii
-- [ ] Pridať závislosť openpyxl do requirements.txt
-- [ ] Vytvoriť Excel import endpoint v routes.py
-- [ ] Vytvoriť schema pre Excel import
-- [ ] Pridať upload formulár do category_detail.html
-- [ ] Implementovať spracovanie Excel súboru
-- [ ] Pridať validáciu a obmedzenie veľkosti súboru (2MB)
-- [ ] Otestovať funkčnosť
+## Changes Made:
+- Modified app/auth/templates/test.html JavaScript logic
+- Added better translation state management
+- Fixed timing issues with translation display
