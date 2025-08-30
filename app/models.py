@@ -49,9 +49,9 @@ class User(Base):
 
 class Category(Base):
     __tablename__ = "categories"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
     user = relationship("User", back_populates="categories")
     words = relationship("Word", back_populates="category")
@@ -59,10 +59,10 @@ class Category(Base):
 
 class Word(Base):
     __tablename__ = "words"
-    id = Column(Integer, primary_key=True)
-    sk = Column(String, nullable=False)
-    en = Column(String, nullable=False)
-    level = Column(Integer, default=1)  # 1: neviem, 2: opakovať, 3: viem
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    sk: Mapped[str] = mapped_column(String, nullable=False)
+    en: Mapped[str] = mapped_column(String, nullable=False)
+    level: Mapped[int] = mapped_column(Integer, default=1)  # 1: neviem, 2: opakovať, 3: viem
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"))
 
     category = relationship("Category", back_populates="words")

@@ -3,6 +3,7 @@
 """Nastavenie databázy pre SQLAlchemy."""
 
 import os
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
@@ -10,12 +11,14 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
+# Load environment variables from env_config.txt
+load_dotenv('env_config.txt')
+
 # Použiť environment variable pre databázové pripojenie
 # Formát pre Supabase: postgresql+asyncpg://postgres:[password]@[host]:[port]/postgres
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "sqlite+aiosqlite:///./vocab.db"  # fallback na SQLite
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required for PostgreSQL connection")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 
