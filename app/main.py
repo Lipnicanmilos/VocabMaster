@@ -3,6 +3,7 @@ from litestar.di import Provide
 from litestar.config.cors import CORSConfig
 from litestar.config.compression import CompressionConfig
 from litestar.middleware.session import SessionMiddleware
+from litestar.static_files import StaticFilesConfig
 from app.session_config import CustomSessionConfig
 from litestar.stores.memory import MemoryStore
 from litestar.plugins.flash import FlashPlugin, FlashConfig
@@ -31,6 +32,10 @@ from app.auth.routes import (
     test_flash,
     words_page
 )
+
+from litestar import get
+from litestar.response import File
+from pathlib import Path
 
 from app.db import get_db_session
 from on_startup import on_startup
@@ -74,6 +79,11 @@ class SessionLoggingMiddleware(BaseHTTPMiddleware):
 
         return response
 
+@get("/favicon.ico")
+async def favicon() -> File:
+    """Serve the favicon.ico file."""
+    return File(path=Path("app/auth/static/favicon.ico"))
+
 app = Litestar(
     route_handlers=[
         homepage,
@@ -94,7 +104,8 @@ app = Litestar(
         test_words,
         test_page,
         test_flash,
-        words_page
+        words_page,
+        favicon
     ],
     dependencies={"db_session": Provide(get_db_session)},
     cors_config=cors_config,
@@ -104,6 +115,9 @@ app = Litestar(
     middleware=[SessionLoggingMiddleware, custom_session_config.middleware],
     template_config=template_config,
     stores={"session": session_store},
+    static_files_config=[
+        StaticFilesConfig(path="/static", directories=[Path("app/auth/static")])
+    ],
     plugins=[flash_plugin]
 )
 

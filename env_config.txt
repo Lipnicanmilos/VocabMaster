@@ -1,0 +1,6 @@
+# Database Configuration - Rename this file to .env
+# Get this from your Supabase project settings -> Database -> Connection string
+DATABASE_URL=postgresql+asyncpg://postgres:bErhQjrJJVwfein3LohL@db.gaohlfxkcdzquzoxhsvk.supabase.co:5432/postgres
+
+# Optional: Set to "true" to enable SQL query logging
+SQL_ECHO=false
