@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtuálne prostredia (vrátane mätúco pomenovaného .env/)
+.env/
+.venv/
+venv/
+env/
+
+# Tajomstvá (súbor .env)
+.env
+
+# Databázy
+*.db
+*.sqlite3
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

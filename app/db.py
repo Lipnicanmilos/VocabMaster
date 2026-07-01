@@ -2,6 +2,9 @@
 
 """Nastavenie databázy pre SQLAlchemy."""
 
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
@@ -9,7 +12,9 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "sqlite+aiosqlite:///./vocab.db"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./vocab.db")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 
